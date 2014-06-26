@@ -2,3 +2,7 @@
 *.iml
 *.ipr
 *.iws
+/target
+.classpath
+.project
+*.prefs
