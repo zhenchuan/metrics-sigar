@@ -29,7 +29,9 @@ public class SigarMetricsTest extends CheckSigarLoadsOk {
     public void testConsoleOut() throws InterruptedException {
         final MetricRegistry registry = new MetricRegistry();
         FileMetrics fileMetrics = SigarMetrics.getInstance().fileMetrics("/tmp") ;
+        fileMetrics.setPrefix("leveldb.data")  ;
         ProcessMetrics metrics = SigarMetrics.getInstance().processMetrics("java");
+        metrics.setPrefix("tomcat.7200");
         metrics.registerGauges(registry);
         fileMetrics.registerGauges(registry);
         final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)

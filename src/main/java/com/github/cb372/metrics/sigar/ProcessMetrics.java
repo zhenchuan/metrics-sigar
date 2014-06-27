@@ -17,6 +17,7 @@ public class ProcessMetrics implements CanRegisterGauges{
 
     private final Sigar sigar;
     private final long pid;
+    private String prefix;
 
     protected ProcessMetrics(Sigar sigar, long pid) {
         this.sigar = sigar;
@@ -24,12 +25,22 @@ public class ProcessMetrics implements CanRegisterGauges{
     }
 
     public void registerGauges(MetricRegistry registry) {
-        registerResidentMem(registry,MetricRegistry.name(getClass(), "mem"));
-        //registerShareMem(registry,MetricRegistry.name(getClass(), "share-mem"));
-        //registerSysCpu(registry,MetricRegistry.name(getClass(), "sys-cpu"));
-        //registerTotalCpu(registry,MetricRegistry.name(getClass(), "total-cpu"));
-        //registerUserCpu(registry,MetricRegistry.name(getClass(), "usr-cpu"));
-        registerPercentCpu(registry, MetricRegistry.name(getClass(), "cpu"));
+        registerResidentMem(registry,MetricRegistry.name(getPrefix(), "mem"));
+        //registerShareMem(registry,MetricRegistry.name(getPrefix(), "share-mem"));
+        //registerSysCpu(registry,MetricRegistry.name(getPrefix(), "sys-cpu"));
+        //registerTotalCpu(registry,MetricRegistry.name(getPrefix(), "total-cpu"));
+        //registerUserCpu(registry,MetricRegistry.name(getPrefix(), "usr-cpu"));
+        registerPercentCpu(registry, MetricRegistry.name(getPrefix(), "cpu"));
+    }
+
+    public ProcessMetrics setPrefix(String prefix){
+        this.prefix = prefix;
+        return this;
+    }
+
+    public String getPrefix(){
+        if(this.prefix==null)return getClass().getName();
+        return this.prefix;
     }
 
     public void registerPercentCpu(MetricRegistry registry,String name){

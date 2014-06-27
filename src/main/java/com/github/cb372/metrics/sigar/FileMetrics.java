@@ -15,6 +15,7 @@ public class FileMetrics implements CanRegisterGauges{
     private final Sigar sigar;
     private final String file;
     private final boolean isDir ;
+    private String prefix;
 
     public FileMetrics(Sigar sigar,String file){
         this.sigar = sigar;
@@ -28,7 +29,17 @@ public class FileMetrics implements CanRegisterGauges{
 
     @Override
     public void registerGauges(MetricRegistry registry) {
-        registerFileSizeGauge(registry,MetricRegistry.name(getClass(),"size"));
+        registerFileSizeGauge(registry,MetricRegistry.name(getPrefix(),"size"));
+    }
+
+    public FileMetrics setPrefix(String prefix){
+        this.prefix = prefix;
+        return this;
+    }
+
+    public String getPrefix(){
+        if(this.prefix==null)return getClass().getName();
+        return this.prefix;
     }
 
     public void registerFileSizeGauge(MetricRegistry metricRegistry,String name){
