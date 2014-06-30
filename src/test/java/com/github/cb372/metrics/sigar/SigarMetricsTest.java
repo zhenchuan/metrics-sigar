@@ -21,7 +21,7 @@ public class SigarMetricsTest extends CheckSigarLoadsOk {
     }
 
     @Test
-    public void testGetPID(){
+    public void canFindThePidOfJavaProcess(){
         assertTrue(SigarMetrics.getInstance().pid("java")>0);
     }
 
