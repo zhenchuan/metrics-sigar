@@ -6,8 +6,10 @@ import com.codahale.metrics.MetricRegistry;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.cmd.Ps;
+import org.hyperic.sigar.ptql.ProcessFinder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SigarMetrics implements CanRegisterGauges {
@@ -93,28 +95,38 @@ public class SigarMetrics implements CanRegisterGauges {
 
     public long pid(String processNameFlag) {
         long foundPid = -1;
-        List<String> foundProcessNames = new ArrayList<String>();
         try {
             Ps ps = new Ps();
-            long[] pids = sigar.getProcList();
-            for (long pid : pids) {
-                List<String> info = ps.getInfo(sigar, pid);
-                if (info.size() > 8) {
-                    String name = info.get(8);
-                    if (name.contains(processNameFlag)) {
-                        foundPid = pid;
-                        foundProcessNames.add(name);
-                    }
-                }
+            ProcessFinder processFinder = new ProcessFinder(sigar);
+            String exp = "Args.*.ct=" + processNameFlag;
+            System.out.println(exp);
+            long[] pidList = processFinder.find(exp);
+            for(long pid : pidList){
+                List<String> info = ps.getInfo(sigar,pid);
+                System.out.println(info);
             }
+            if(pidList.length ==0 ){
+                exp = "Exe.Name.ct=" + processNameFlag;
+                System.out.println(exp);
+                pidList = processFinder.find(exp);
+            }
+            if(pidList.length > 1) {
+                throw new IllegalArgumentException("find more than one process with your provided process name's flag : [" + processNameFlag + "]." +
+                        "\tfound processes :\n" + join(pidList));
+            }
+            if(pidList.length == 1)foundPid = pidList[0];
         } catch (SigarException e) {
             e.printStackTrace();
         }
-        if (foundProcessNames.size() > 1) {
-            throw new IllegalArgumentException("find more than one process with your provided process name's flag : [" + processNameFlag + "].\tfound processes :\n" +
-                    foundProcessNames);
-        }
         return foundPid;
+    }
+
+    private String join(long... args){
+        StringBuilder sb = new StringBuilder();
+        for(long arg : args){
+            sb.append(arg).append(";");
+        }
+        return sb.toString();
     }
 
 }
