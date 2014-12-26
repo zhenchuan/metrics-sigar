@@ -6,8 +6,11 @@ import org.hyperic.sigar.ProcCpu;
 import org.hyperic.sigar.ProcMem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
+import org.hyperic.sigar.cmd.Ps;
+import org.hyperic.sigar.ptql.ProcessFinder;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by zhenchuan on 6/26/14.
@@ -15,12 +18,13 @@ import java.math.BigDecimal;
 public class ProcessMetrics implements CanRegisterGauges {
 
     private final Sigar sigar;
-    private final long pid;
+
+    private final String flag;
     private String prefix;
 
-    protected ProcessMetrics(Sigar sigar, long pid) {
+    protected ProcessMetrics(Sigar sigar, String flag) {
         this.sigar = sigar;
-        this.pid = pid;
+        this.flag = flag;
     }
 
     public void registerGauges(MetricRegistry registry) {
@@ -141,7 +145,7 @@ public class ProcessMetrics implements CanRegisterGauges {
 
     public ProcMem mem() {
         try {
-            return sigar.getProcMem(pid);
+            return sigar.getProcMem(SigarMetrics.getInstance().pid(flag));
         } catch (SigarException e) {
             return null;
         }
@@ -149,7 +153,7 @@ public class ProcessMetrics implements CanRegisterGauges {
 
     public ProcCpu cpu() {
         try {
-            return sigar.getProcCpu(pid);
+            return sigar.getProcCpu(SigarMetrics.getInstance().pid(flag));
         } catch (SigarException e) {
             return null;
         }

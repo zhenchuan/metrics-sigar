@@ -73,24 +73,24 @@ public class SigarMetrics implements CanRegisterGauges {
         return ulimit;
     }
 
-    public ProcessMetrics processMetrics(long pid) {
-        ProcessMetrics processMetrics = new ProcessMetrics(sigar, pid);
+    public ProcessMetrics processMetrics(String flag) {
+        assertFlag(flag);
+        ProcessMetrics processMetrics = new ProcessMetrics(sigar, flag);
         processMetricsList.add(processMetrics);
         return processMetrics;
-    }
-
-    public ProcessMetrics processMetrics(String processNameFlag) {
-        long pid = pid(processNameFlag);
-        if (pid == -1) {
-            throw new IllegalArgumentException("can't find the process with your process name's flag : [" + processNameFlag + "]");
-        }
-        return processMetrics(pid);
     }
 
     public FileMetrics fileMetrics(String absoluteFilePath) {
         FileMetrics fileMetrics = new FileMetrics(sigar, absoluteFilePath);
         fileMetricsList.add(fileMetrics);
         return fileMetrics;
+    }
+
+    public void assertFlag(String processNameFlag){
+        long pid = pid(processNameFlag);
+        if(pid == -1){
+            throw new IllegalArgumentException("can't find the process with your process name's flag : [" + processNameFlag + "]");
+        }
     }
 
     public long pid(String processNameFlag) {
